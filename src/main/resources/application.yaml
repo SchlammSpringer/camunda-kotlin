@@ -1,1 +1,6 @@
-
+camunda:
+  bpm:
+    admin-user:
+      id: demo
+      password: demo
+    auto-deployment-enabled: on

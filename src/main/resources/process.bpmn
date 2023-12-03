@@ -28,7 +28,7 @@
         <bpmn:incoming>Flow_1hzwys0</bpmn:incoming>
       </bpmn:endEvent>
       <bpmn:sequenceFlow id="Flow_1hzwys0" sourceRef="Gateway_1j7nky6" targetRef="PrepareShoppingCompleted" />
-      <bpmn:exclusiveGateway id="Gateway_08t1zv7" name="Shopping card needed?" default="Flow_0ka5yss">
+      <bpmn:exclusiveGateway id="Gateway_08t1zv7" name="Shopping cart needed?" default="Flow_0ka5yss">
         <bpmn:incoming>Flow_03a826d</bpmn:incoming>
         <bpmn:outgoing>Flow_0ka5yss</bpmn:outgoing>
         <bpmn:outgoing>Flow_1lsm3xs</bpmn:outgoing>
@@ -248,7 +248,7 @@
       <bpmndi:BPMNShape id="Gateway_08t1zv7_di" bpmnElement="Gateway_08t1zv7" isMarkerVisible="true">
         <dc:Bounds x="515" y="445" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="505" y="415" width="71" height="27" />
+          <dc:Bounds x="507" y="415" width="68" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1uyshig_di" bpmnElement="Gateway_1uyshig" isMarkerVisible="true">

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1kokj5l" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.17.0">
+  <bpmn:collaboration id="Collaboration_115jcnj">
+    <bpmn:participant id="Participant_0qoyydm" name="Party People" processRef="AtTheBar" />
+    <bpmn:participant id="Participant_0ox371f" name="the Barkeeper" processRef="Process_14o53ap" />
+    <bpmn:messageFlow id="MessageFlow_1m958xr" sourceRef="OrderBeerTask" targetRef="StartEvent_0b8cb2u" />
+    <bpmn:messageFlow id="MessageFlow_1h13sgh" sourceRef="SubProcess_1ooaaym" targetRef="OrderBeerTask" />
+    <bpmn:messageFlow id="MessageFlow_1judu1h" sourceRef="Task_1c6tprt" targetRef="WaitForBeer" />
+  </bpmn:collaboration>
+  <bpmn:process id="AtTheBar" name="Simple Party" isExecutable="true" camunda:historyTimeToLive="1">
+    <bpmn:startEvent id="StartEvent_1" name="At the bar">
+      <bpmn:outgoing>SequenceFlow_1hmhl28</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="OrderBeerTask" name="Order some beer" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="${orderBeer}">
+      <bpmn:incoming>SequenceFlow_1hmhl28</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0kscs9p</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0b2l9s8</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1hmhl28" sourceRef="StartEvent_1" targetRef="OrderBeerTask" />
+    <bpmn:sequenceFlow id="SequenceFlow_0b2l9s8" sourceRef="OrderBeerTask" targetRef="WaitForBeer" />
+    <bpmn:sequenceFlow id="SequenceFlow_1w55f99" sourceRef="WaitForBeer" targetRef="DrinkBeerTask" />
+    <bpmn:receiveTask id="WaitForBeer" name="Wait for beer" messageRef="Message_0xsw556">
+      <bpmn:incoming>SequenceFlow_0b2l9s8</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1w55f99</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:sequenceFlow id="SequenceFlow_02ok03g" sourceRef="DrinkBeerTask" targetRef="ExclusiveGatewayDrunk" />
+    <bpmn:serviceTask id="DrinkBeerTask" name="drink beer" camunda:delegateExpression="${drinkBeer}">
+      <bpmn:incoming>SequenceFlow_1w55f99</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_02ok03g</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0kscs9p" name="no" sourceRef="ExclusiveGatewayDrunk" targetRef="OrderBeerTask">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${drunk == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGatewayDrunk" name="drunk?">
+      <bpmn:incoming>SequenceFlow_02ok03g</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_16kgy9n</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0kscs9p</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0yizc0x" sourceRef="VomitTask" targetRef="WaitForTheDoctor" />
+    <bpmn:sequenceFlow id="SequenceFlow_16kgy9n" name="yes" sourceRef="ExclusiveGatewayDrunk" targetRef="VomitTask">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${drunk == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sendTask id="VomitTask" name="vomit" camunda:delegateExpression="${vomit}">
+      <bpmn:incoming>SequenceFlow_16kgy9n</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0yizc0x</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:boundaryEvent id="BoundaryEventErrorWithoutAlcohol" name="beer without Alcohol!!!" attachedToRef="DrinkBeerTask">
+      <bpmn:outgoing>SequenceFlow_1ax8ote</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="Error_0aqvnxa" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1ax8ote" sourceRef="BoundaryEventErrorWithoutAlcohol" targetRef="BrawlTask" />
+    <bpmn:manualTask id="BrawlTask" name="start a pubs brawl">
+      <bpmn:incoming>SequenceFlow_1ax8ote</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1qj3z2j</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1qj3z2j" sourceRef="BrawlTask" targetRef="WaitForPoliceTask" />
+    <bpmn:sequenceFlow id="SequenceFlow_1ooizm2" sourceRef="WaitForPoliceTask" targetRef="EndEvent_1qy8g5j" />
+    <bpmn:endEvent id="EndEvent_1qy8g5j">
+      <bpmn:incoming>SequenceFlow_1ooizm2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="EndEvent_0fseb29">
+      <bpmn:incoming>SequenceFlow_036l92e</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:receiveTask id="WaitForPoliceTask" name="wait for Police" messageRef="Message_0ne3zbe">
+      <bpmn:incoming>SequenceFlow_1qj3z2j</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1ooizm2</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:sequenceFlow id="SequenceFlow_036l92e" sourceRef="WaitForTheDoctor" targetRef="EndEvent_0fseb29" />
+    <bpmn:receiveTask id="WaitForTheDoctor" name="wait for the doctor" messageRef="Message_19wa10k">
+      <bpmn:incoming>SequenceFlow_0yizc0x</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_036l92e</bpmn:outgoing>
+    </bpmn:receiveTask>
+  </bpmn:process>
+  <bpmn:process id="Process_14o53ap" isExecutable="false">
+    <bpmn:startEvent id="StartEvent_0b8cb2u">
+      <bpmn:outgoing>SequenceFlow_1d7jsbz</bpmn:outgoing>
+      <bpmn:messageEventDefinition />
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1d7jsbz" sourceRef="StartEvent_0b8cb2u" targetRef="SubProcess_1ooaaym" />
+    <bpmn:sequenceFlow id="SequenceFlow_09uvrph" sourceRef="SubProcess_1ooaaym" targetRef="Task_1dcw74r" />
+    <bpmn:sendTask id="SubProcess_1ooaaym" name="&#34;Okay some beer for you&#34;">
+      <bpmn:incoming>SequenceFlow_1d7jsbz</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_09uvrph</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:serviceTask id="Task_1dcw74r" name="Barkeeper magic">
+      <bpmn:incoming>SequenceFlow_09uvrph</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1rpjwl1</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1rpjwl1" sourceRef="Task_1dcw74r" targetRef="Task_1c6tprt" />
+    <bpmn:sequenceFlow id="SequenceFlow_1w9ayv7" sourceRef="Task_1c6tprt" targetRef="EndEvent_17b2gz9" />
+    <bpmn:sendTask id="Task_1c6tprt" name="&#34;Here is your beer&#34;">
+      <bpmn:incoming>SequenceFlow_1rpjwl1</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1w9ayv7</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="EndEvent_17b2gz9">
+      <bpmn:incoming>SequenceFlow_1w9ayv7</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:message id="Message_0xsw556" name="MessageForBeer" />
+  <bpmn:message id="Message_0ne3zbe" name="MessageWaitForPolice" />
+  <bpmn:error id="Error_0aqvnxa" name="ErrorWithoutAlcohol" errorCode="WITHOUTALCOHOL" />
+  <bpmn:message id="Message_19wa10k" name="MessageWaitForTheDoctor" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_115jcnj">
+      <bpmndi:BPMNShape id="Participant_0qoyydm_di" bpmnElement="Participant_0qoyydm" isHorizontal="true">
+        <dc:Bounds x="140" y="440" width="1610" height="360" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="212" y="602" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="206" y="645" width="49" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0jua383_di" bpmnElement="OrderBeerTask">
+        <dc:Bounds x="300" y="580" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveTask_1lc8emr_di" bpmnElement="WaitForBeer">
+        <dc:Bounds x="580" y="580" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0due0ii_di" bpmnElement="DrinkBeerTask">
+        <dc:Bounds x="780" y="580" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1pwbnxg_di" bpmnElement="ExclusiveGatewayDrunk" isMarkerVisible="true">
+        <dc:Bounds x="965" y="595" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="973" y="573" width="34" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendTask_06bog76_di" bpmnElement="VomitTask">
+        <dc:Bounds x="1120" y="580" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ManualTask_0z1pzd2_di" bpmnElement="BrawlTask">
+        <dc:Bounds x="1120" y="460" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1qy8g5j_di" bpmnElement="EndEvent_1qy8g5j">
+        <dc:Bounds x="1432" y="482" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0fseb29_di" bpmnElement="EndEvent_0fseb29">
+        <dc:Bounds x="1432" y="602" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveTask_1xehqo9_di" bpmnElement="WaitForPoliceTask">
+        <dc:Bounds x="1280" y="460" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveTask_1wrqyku_di" bpmnElement="WaitForTheDoctor">
+        <dc:Bounds x="1280" y="580" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryEvent_0qrr6nd_di" bpmnElement="BoundaryEventErrorWithoutAlcohol">
+        <dc:Bounds x="862" y="562" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="889" y="536" width="61" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1hmhl28_di" bpmnElement="SequenceFlow_1hmhl28">
+        <di:waypoint x="248" y="620" />
+        <di:waypoint x="300" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0b2l9s8_di" bpmnElement="SequenceFlow_0b2l9s8">
+        <di:waypoint x="400" y="620" />
+        <di:waypoint x="580" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1w55f99_di" bpmnElement="SequenceFlow_1w55f99">
+        <di:waypoint x="680" y="620" />
+        <di:waypoint x="780" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_02ok03g_di" bpmnElement="SequenceFlow_02ok03g">
+        <di:waypoint x="880" y="620" />
+        <di:waypoint x="965" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0kscs9p_di" bpmnElement="SequenceFlow_0kscs9p">
+        <di:waypoint x="990" y="645" />
+        <di:waypoint x="990" y="710" />
+        <di:waypoint x="350" y="710" />
+        <di:waypoint x="350" y="660" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="959" y="674" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0yizc0x_di" bpmnElement="SequenceFlow_0yizc0x">
+        <di:waypoint x="1220" y="620" />
+        <di:waypoint x="1280" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_16kgy9n_di" bpmnElement="SequenceFlow_16kgy9n">
+        <di:waypoint x="1015" y="620" />
+        <di:waypoint x="1120" y="620" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1041" y="593" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ax8ote_di" bpmnElement="SequenceFlow_1ax8ote">
+        <di:waypoint x="880" y="562" />
+        <di:waypoint x="880" y="500" />
+        <di:waypoint x="1120" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1qj3z2j_di" bpmnElement="SequenceFlow_1qj3z2j">
+        <di:waypoint x="1220" y="500" />
+        <di:waypoint x="1280" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ooizm2_di" bpmnElement="SequenceFlow_1ooizm2">
+        <di:waypoint x="1380" y="500" />
+        <di:waypoint x="1432" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_036l92e_di" bpmnElement="SequenceFlow_036l92e">
+        <di:waypoint x="1380" y="620" />
+        <di:waypoint x="1432" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_0ox371f_di" bpmnElement="Participant_0ox371f" isHorizontal="true">
+        <dc:Bounds x="129" y="80" width="651" height="260" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1liy5xw_di" bpmnElement="StartEvent_0b8cb2u">
+        <dc:Bounds x="192" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendTask_1dslfqz_di" bpmnElement="SubProcess_1ooaaym">
+        <dc:Bounds x="300" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1ck011e_di" bpmnElement="Task_1dcw74r">
+        <dc:Bounds x="430" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendTask_11tkmce_di" bpmnElement="Task_1c6tprt">
+        <dc:Bounds x="570" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0l58ig3_di" bpmnElement="EndEvent_17b2gz9">
+        <dc:Bounds x="712" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1d7jsbz_di" bpmnElement="SequenceFlow_1d7jsbz">
+        <di:waypoint x="228" y="200" />
+        <di:waypoint x="300" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_09uvrph_di" bpmnElement="SequenceFlow_09uvrph">
+        <di:waypoint x="400" y="200" />
+        <di:waypoint x="430" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1rpjwl1_di" bpmnElement="SequenceFlow_1rpjwl1">
+        <di:waypoint x="530" y="200" />
+        <di:waypoint x="570" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1w9ayv7_di" bpmnElement="SequenceFlow_1w9ayv7">
+        <di:waypoint x="670" y="200" />
+        <di:waypoint x="712" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_1m958xr_di" bpmnElement="MessageFlow_1m958xr">
+        <di:waypoint x="350" y="580" />
+        <di:waypoint x="350" y="400" />
+        <di:waypoint x="210" y="400" />
+        <di:waypoint x="210" y="218" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_1h13sgh_di" bpmnElement="MessageFlow_1h13sgh">
+        <di:waypoint x="350" y="240" />
+        <di:waypoint x="350" y="580" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_1judu1h_di" bpmnElement="MessageFlow_1judu1h">
+        <di:waypoint x="620" y="240" />
+        <di:waypoint x="620" y="580" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

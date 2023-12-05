@@ -8,7 +8,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.every
 import io.mockk.verify
 import org.camunda.bpm.engine.RuntimeService
-import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.*
+import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
@@ -18,16 +18,16 @@ class AtTheBarTest(
     @MockkBean private val drinkBeer: DrinkBeer,
     @MockkBean private val vomit: Vomit,
 ) : DescribeSpec({
+    every { drinkBeer.execute(any()) } answers { println("I´m drinking a beer") }
+    every { vomit.execute(any()) } answers { println("looks like reverse beer") }
+    every { orderBeer.execute(any()) } answers { println("one beer plz") }
     val processInstance = runtimeService.startProcessInstanceByKey("AtTheBar", mapOf("drunk" to true))
 
     describe("when I´m at the bar") {
         it("make sure I can order some beer") {
-            assertThat(processInstance).isStarted().isWaitingAt("OrderBeerTask")
+            assertThat(processInstance).isStarted().hasPassed("OrderBeerTask")
         }
         describe("I order some beer") {
-            every { orderBeer.execute(any()) } returns println("one beer plz")
-            //    Async
-            execute(job())
             it("and proof myself I said 'plz'") {
                 verify { orderBeer.execute(any()) }
             }
@@ -35,9 +35,6 @@ class AtTheBarTest(
                 assertThat(processInstance).isWaitingAt("WaitForBeer")
             }
             describe("and when the Barkeeper says 'Here is your beer'") {
-
-                every { drinkBeer.execute(any()) } returns println("I´m drinking a beer")
-                every { vomit.execute(any()) } returns println("looks like reverse beer")
                 runtimeService
                     .createMessageCorrelation("MessageForBeer")
                     .processInstanceId(processInstance.id)

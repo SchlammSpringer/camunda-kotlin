@@ -1,5 +1,6 @@
 package com.example.camundakotlin
 
+import com.example.camundakotlin.Process.ActivityIds.*
 import com.example.camundakotlin.Process.Variables.*
 import com.example.camundakotlin.delegates.*
 import com.ninjasquad.springmockk.MockkBean
@@ -47,14 +48,26 @@ class ShoppingProcessDummyImplementationTest(
 
     describe("start process with") {
         it("simplest completion path") {
-           val defaultValues = mapOf(
+            val defaultValues = mapOf(
                 CART_NEEDED.variable to false,
                 CART_MANDATORY.variable to false,
                 SHOPPING_LIST.variable to listOf("Bread"),
                 ALL_GOODS_BOUGHT.variable to true
             )
+            val processInstance: ProcessInstance = runtimeService.startProcessInstanceByKey(
+                Process.NAME, defaultValues
+            )
 
-          }
+            assertThat(processInstance).isEnded
+            assertThat(processInstance).hasPassedInOrder(
+                CREATE_SHOPPING_LIST.variable, PREPARE_MEANS_OF_PAYMENT.variable, PREPARE_SHOPPING_COMPLETED.variable,
+                CHOOSE_GOODS.variable, PAY_GOODS.variable, SHOPPING_COMPLETED.variable,
+            )
+            assertThat(processInstance).hasNotPassed(
+                PREPARE_CART_DEPOSIT.variable, TAKE_CART.variable, CREATE_NEW_SHOPPING_LIST.variable
+            )
+
+        }
 
         it("cart needed but not mandatory") {
             val shoppingList = randomNames(5)
@@ -70,8 +83,8 @@ class ShoppingProcessDummyImplementationTest(
             )
 
             assertThat(processInstance).isEnded
-            assertThat(processInstance).hasNotPassed(Process.ActivityIds.CREATE_NEW_SHOPPING_LIST.variable)
-            assertThat(processInstance).hasNotPassed(Process.ActivityIds.SHOPPING_FAILED.variable)
+            assertThat(processInstance).hasNotPassed(CREATE_NEW_SHOPPING_LIST.variable)
+            assertThat(processInstance).hasNotPassed(SHOPPING_FAILED.variable)
         }
     }
 })

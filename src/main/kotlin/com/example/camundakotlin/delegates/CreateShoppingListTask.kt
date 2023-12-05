@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class CreateShoppingListTask : JavaDelegate {
-    override fun execute(execution: DelegateExecution?) {
+    override fun execute(execution: DelegateExecution) {
         TODO("Not yet implemented")
 
        /* execution.setVariableIfMissing(Process.Variables.SHOPPING_LIST) {

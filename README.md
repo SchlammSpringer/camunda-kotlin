@@ -1,1 +1,1 @@
-![At the bar](“simple.png”)
+![At the bar](“https://github.com/SchlammSpringer/camunda-kotlin/blob/cb26ba6f3aa48e5dbc66f311176876ddcdf6c5e2/simple.png”)
